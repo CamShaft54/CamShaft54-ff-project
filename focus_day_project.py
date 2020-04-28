@@ -1,2 +1,17 @@
-# Welcome to your Focus Day Project. Replace this comment with something that introduces the user to your project. Be sure to mention the Focus Day and your initials and graduation year. (ie This game is for Pool Volume Day and is written by ML '23.)
-# Also, be sure to use comments throughout your program. Use good programming practices, including organization, documentation and citation. Yes, you need to cite your sources! (You can do so using comments at the bottom of your code.)
+print("Developed by Cameron Industries, All Rights Reserved. ")
+print("Do not distribute without written permission from Cameron Industries.")
+mode_select = input("Press P for Pool Volume, Press C for Soda Can Day, Press S for Softballs in the Gym Day")
+mode_select = mode_select.upper()
+if mode_select == "P":
+    pool_length = float(input("Pool Length"))
+    pool_width = float(input("Pool Width"))
+    pool_depth = float(input("Pool Depth"))
+    stairs_width = float(input("Stairs Width"))
+    stairs_length = float(input("Stairs Length"))
+    stairs_depth = float(input("Stairs Depth at Highest Stair"))
+    stairs_amount = float(input("Number of Stairs"))
+    main_pool_volume = pool_length * pool_width * pool_depth
+    stair_volume = stairs_width * stairs_depth * stairs_length
+    stairs_volume = stair_volume * stairs_amount
+    total_volume = main_pool_volume + stairs_volume
+    print(total_volume)
