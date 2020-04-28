@@ -7,6 +7,6 @@
 1. Using Matplotlib, graph a list of values. Due 5/10/20
 2. Given the number of balls per simulation that fit in gym, show graph with values. 5/11/20
 ## Part 3: Final Touches
-1. Add speed adjustment into pygame window. 5/12/20
+1. Add speed adjustment into Pygame window. 5/12/20
 2. Create fancy GUI for inputting size of balls and dimensions of gym and displaying data. 5/15/20
 3. Create easter egg game hidden inside code. *(optional)* 5/21/20
