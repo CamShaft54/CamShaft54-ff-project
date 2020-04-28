@@ -20,6 +20,7 @@ def addVectors(angle1, length1, angle2, length2):
 
     return angle, length
 
+
 class Particle:
     def __init__(self, x, y, size):
         self.x = x
