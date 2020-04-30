@@ -1,8 +1,8 @@
 import pymunk
 import pyglet
 from pymunk.pyglet_util import DrawOptions
+from pyglet.window import key
 
-sum_of_balls = 0
 # Create Pyglet Window
 window = pyglet.window.Window(1280, 720, "Pymunk Testing", resizable=False)
 options = DrawOptions()
@@ -17,17 +17,25 @@ segment_shape_base = pymunk.Segment(space.static_body, (0, 0), (800, 0), 2)
 segment_shape_base.body.position = 200, 70
 segment_shape_base.elasticity = 0
 segment_shape_base.friction = 1.0
+
 segment_shape_left = pymunk.Segment(space.static_body, (0, 500), (0, 0), 2)
 segment_shape_left.body.position = 200, 70
 segment_shape_left.elasticity = 0
 segment_shape_left.friction = 1.0
+
 segment_body_right = pymunk.Body(body_type=pymunk.Body.STATIC)
 segment_body_right.position = 1000, 70
 segment_shape_right = pymunk.Segment(segment_body_right, (0, 500), (0, 0), 2)
 segment_shape_right.elasticity = 0
 segment_shape_right.friction = 1.0
 
-checked_shapes = [segment_shape_base, segment_shape_left, segment_shape_right]
+segment_body_top = pymunk.Body(body_type=pymunk.Body.STATIC)
+segment_body_top.position = 200, 570
+segment_shape_top = pymunk.Segment(segment_body_top, (0, 0), (800, 0), 2)
+segment_shape_top.elasticity = 0
+segment_shape_top.friction = 1.0
+
+checked_shapes = [segment_shape_base, segment_shape_left, segment_shape_right, segment_shape_top]
 # Add shapes/bodies to space
 space.add(segment_shape_base, segment_shape_left, segment_shape_right, segment_body_right)
 
@@ -49,15 +57,23 @@ def on_mouse_press(x, y, button, modifiers):
     space.add(circle_body, circle_shape)
 
 
+@window.event
+def on_key_press(symbol, modifiers):
+    t_press = False
+    if symbol == key.T and segment_shape_top not in space.shapes:
+        print("Top segment added")
+        space.add(segment_shape_top, segment_body_top)
+    elif symbol == key.T and segment_shape_top in space.shapes:
+        space.remove(segment_shape_top.body, segment_shape_top)
+
+
 def update(dt):  # Increase physics simulation by one, check if object is below y = 100, if so remove it.
-    global sum_of_balls
     global checked_shapes
     space.step(dt)
     for shape in space.shapes:
         if shape.body.position.y < 470 and shape not in checked_shapes:
-            sum_of_balls += 1
             checked_shapes.append(shape)
-    print(sum_of_balls)
+    print(len(checked_shapes)-3)
 
 
 if __name__ == "__main__":  # Driver code to update simulation
