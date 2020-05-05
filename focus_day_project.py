@@ -131,9 +131,12 @@ def update(dt):  # This function is called every 1/60 of a second.
     changed_list = False  # Set changed_list to false (If true, print number of balls in checked_shapes).
     if timer == 0 and auto:  # If auto mode is active and 2 seconds have elapsed, check for overflow.
         print("checking for overflow...")
-        for i in range(min(len(previous_new_balls), len(new_balls))):  # for loop checks balls from 2 seconds ago that are above top wall with current balls above top wall.
-            if i < min(len(previous_new_balls), len(new_balls)) and previous_new_balls[i] in new_balls and auto:  # Check every ball from 2 seconds ago to see if still above.
-                ball_spawning = False  # If so, deactivate ball_spawning, auto mode, clear new_balls, clear previous_new_balls.
+        # for loop checks balls from 2 seconds ago that are above top wall with current balls above top wall.
+        for i in range(min(len(previous_new_balls), len(new_balls))):
+            # Check every ball from 2 seconds ago to see if still above.
+            if i < min(len(previous_new_balls), len(new_balls)) and previous_new_balls[i] in new_balls and auto:
+                # If so, deactivate ball_spawning, auto mode, clear new_balls, clear previous_new_balls.
+                ball_spawning = False
                 auto = False
                 new_balls.clear()
                 previous_new_balls.clear()
@@ -146,14 +149,18 @@ def update(dt):  # This function is called every 1/60 of a second.
     if timer == 1:  # Every two seconds (right after checking for overflow) set previous_new_balls equal to new_balls
         previous_new_balls = new_balls
     for shape in space.shapes:  # for loop checks all balls and adds or removes them from lists.
-        if shape.body.position.y <= 600 - radius and shape not in checked_shapes and shape not in wall_shapes:  # if ball in gym add to checked_shapes
+        # if ball in gym add to checked_shapes
+        if shape.body.position.y <= 600 - radius and shape not in checked_shapes and shape not in wall_shapes:
             checked_shapes.append(shape)
             changed_list = True
-        if shape.body.position.y > 600 - radius and shape not in wall_shapes:  # If ball above gym height add to new_balls
+        # If ball above gym height add to new_balls
+        if shape.body.position.y > 600 - radius and shape not in wall_shapes:
             new_balls.append(shape)
-        if shape.body.position.y < 600 and shape in new_balls:  # If ball in new_balls and below gym height, remove from new_balls
+        # If ball in new_balls and below gym height, remove from new_balls
+        if shape.body.position.y < 600 and shape in new_balls:
             new_balls.remove(shape)
-        if shape.body.position.y < (600 - H) and shape not in wall_shapes:  # If ball is below gym height remove from space and checked_shapes.
+        # If ball is below gym height remove from space and checked_shapes.
+        if shape.body.position.y < (600 - H) and shape not in wall_shapes:
             if shape in checked_shapes:
                 checked_shapes.remove(shape)
             space.remove(shape.body, shape)
