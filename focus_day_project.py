@@ -3,8 +3,6 @@ import pyglet
 from pymunk.pyglet_util import DrawOptions
 from pyglet.window import key
 import random
-import threading
-import time
 
 # Prompt user to enter Height and Width in pixels, radius of circles, and mass.
 H = int(input("Enter Height of Gym: "))
@@ -58,7 +56,7 @@ segment_shape_right_fun.elasticity = bounce
 segment_shape_right_fun.friction = 1.0
 # add gym walls to and funnel walls to wall shapes so they won't get counted multiple times or deleted.
 wall_shapes = [segment_shape_base, segment_shape_left, segment_shape_right, segment_shape_top, segment_shape_right_fun
-               , segment_shape_left_fun, segment_body_top, segment_shape_top]
+               , segment_shape_left_fun, segment_shape_top]
 checked_shapes = []
 new_balls = []
 previous_new_balls = []
@@ -67,6 +65,7 @@ tests = []
 space.add(segment_shape_base, segment_shape_left, segment_shape_right, segment_body_right, segment_shape_left_fun
           , segment_body_left_fun, segment_shape_right_fun, segment_body_right_fun)
 ball_spawning = False
+ball_cleanup = False
 auto = False
 timer = 0
 
@@ -84,15 +83,6 @@ def make_ball(x, y):  # Makes ball from given coordinates and adds it to space
 def random_ball(status):  # Generate a random ball between the specified coordinates
     if status:
         make_ball(random.randint((1280 - W) / 2, (1280 - W) / 2 + W), 650)
-
-
-def auto_mode_disable():
-    space.add(segment_shape_top, segment_body_top)
-    event = threading.Event()
-    event.wait(0.5)
-    space.remove(segment_shape_top, segment_body_top)
-    event.wait(1)
-    space.add(segment_shape_top, segment_body_top)
 
 
 @window.event  # draw the space in window
@@ -122,6 +112,8 @@ def on_key_press(symbol, modifiers):
         checked_shapes.clear()
     if symbol == key.A:
         print("Auto mode enabled")
+        if segment_shape_top in space.shapes:
+            space.remove(segment_shape_top, segment_body_top)
         ball_spawning = not ball_spawning
         auto = True
     if symbol == key.D:
@@ -133,15 +125,30 @@ def on_key_press(symbol, modifiers):
 
 def update(dt):  # Increase physics simulation by one, check if object's position is y <= 470, if so add it to
     # checked shapes, print checked shapes amount if different.
-    global checked_shapes, ball_spawning, auto, new_balls, previous_new_balls, timer
+    global checked_shapes, ball_spawning, auto, new_balls, previous_new_balls, timer, ball_cleanup
     space.step(dt)
     changed_list = False
-    previous_new_balls = new_balls
+    if timer == 0 and auto:
+        print("checking for overflow...")
+        for i in range(min(len(previous_new_balls), len(new_balls))):
+            if i < min(len(previous_new_balls), len(new_balls)) and previous_new_balls[i].body.position == new_balls[i].body.position and auto:
+                ball_spawning = False
+                auto = False
+                new_balls.clear()
+                for shape in space.shapes:
+                    if shape.body.position.y >= 600 and shape not in wall_shapes:
+                        space.remove(shape.body, shape)
+                space.add(segment_shape_top, segment_body_top)
+                ball_cleanup = True
+    timer = (timer + 1) % 120
+    if timer == 1:
+        previous_new_balls = new_balls
+        print("previous")
     for shape in space.shapes:
         if shape.body.position.y <= 600 - radius and shape not in checked_shapes and shape not in wall_shapes:
             checked_shapes.append(shape)
             changed_list = True
-        if shape.body.position.y > 600 - radius and shape not in wall_shapes and timer == 0:
+        if shape.body.position.y > 600 - radius and shape not in wall_shapes:
             new_balls.append(shape)
         if shape.body.position.y < 600 and shape in new_balls:
             new_balls.remove(shape)
@@ -153,25 +160,19 @@ def update(dt):  # Increase physics simulation by one, check if object's positio
     random_ball(ball_spawning)
     if changed_list:
         print(str(len(checked_shapes)) + " balls")
-    timer = (timer + 1) % 120
-    execute = True
-    if timer == 0 and auto:
-        print("checking for overflow...")
-        for i in range(min(len(previous_new_balls), len(new_balls))):
-            if previous_new_balls[i].body.position == new_balls[i].body.position:
-                if execute:
-                    ball_spawning = False
-                    auto = False
-                    new_balls.clear()
-                    auto_mode_disable()
-                    for shape in space.shapes:
-                        if shape.body.position.y >= 600 and shape not in wall_shapes:
-                            space.remove(shape.body, shape)
-                    tests.append(len(checked_shapes))
-                    checked_shapes.clear()
-                    print("Auto mode disabled")
-                    print("Test results: " + str(tests))
-                break
+    if ball_cleanup:
+        if timer == 29:
+            space.remove(segment_shape_top, segment_body_top)
+        if timer == 119:
+            ball_cleanup = False
+            space.add(segment_shape_top, segment_body_top)
+            for shape in space.shapes:
+                if shape.body.position.y >= 600 and shape not in wall_shapes:
+                    space.remove(shape.body, shape)
+            print("Auto mode disabled")
+            tests.append(len(checked_shapes))
+            checked_shapes.clear()
+            print("Test results: " + str(tests))
 
 
 if __name__ == "__main__":  # Driver code to update simulation
