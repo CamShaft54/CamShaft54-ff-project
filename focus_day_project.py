@@ -126,35 +126,42 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
 
 
 def update(dt):  # This function is called every 1/60 of a second.
-    global checked_shapes, ball_spawning, auto, new_balls, previous_new_balls, timer, ball_cleanup
+    global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup
     space.step(dt)  # Step forward the physics simulation.
     changed_list = False  # Set changed_list to false (If true, print number of balls in checked_shapes).
-    if timer == 0 and auto:  # If auto mode is active and 2 seconds have elapsed, check for overflow.
+    if timer == 0 and auto and len(previous_new_balls) > 1:  # If auto mode is active and 2 seconds have elapsed, check for overflow.
         print("checking for overflow...")
         # for loop checks balls from 2 seconds ago that are above top wall with current balls above top wall.
-        for i in range(min(len(previous_new_balls), len(new_balls))):
+        print(len(previous_new_balls), len(new_balls))
+        for i in range(len(previous_new_balls)):
             # Check every ball from 2 seconds ago to see if still above.
-            if i < min(len(previous_new_balls), len(new_balls)) and previous_new_balls[i] in new_balls and auto:
-                # If so, deactivate ball_spawning, auto mode, clear new_balls, clear previous_new_balls.
-                ball_spawning = False
-                auto = False
-                new_balls.clear()
-                previous_new_balls.clear()
-                for shape in space.shapes:  # Remove all balls above top wall.
-                    if shape.body.position.y >= 600 and shape not in wall_shapes:
-                        space.remove(shape.body, shape)
-                space.add(segment_shape_top, segment_body_top)
-                ball_cleanup = True  # Activate ball_cleanup.
+            current_previous_ball = (round(previous_new_balls[i].body.position.x), round(previous_new_balls[i].body.position.y))
+            for j in range(len(new_balls)):
+                current_new_ball = (round(new_balls[j].body.position.x), round(new_balls[j].body.position.y))
+                print(current_previous_ball)
+                print(current_new_ball)
+                # Error: on the line below I keep getting a list index out of range error even though it should be fine.
+                if abs(current_new_ball[0] - current_previous_ball[0]) < 10 and abs(current_new_ball[1] - current_previous_ball[1]) < 10 and auto:
+                    # If so, deactivate ball_spawning, deactivate auto mode, clear new_balls, clear previous_new_balls.
+                    ball_spawning = False
+                    auto = False
+                    new_balls.clear()
+                    previous_new_balls.clear()
+                    for shape in space.shapes:  # Remove all balls above top wall.
+                        if shape.body.position.y >= 600 and shape not in wall_shapes:
+                            space.remove(shape.body, shape)
+                    space.add(segment_shape_top, segment_body_top)
+                    ball_cleanup = True  # Activate ball_cleanup.
     timer = (timer + 1) % 120  # Progress timer forward by one.
     if timer == 1:  # Every two seconds (right after checking for overflow) set previous_new_balls equal to new_balls
-        previous_new_balls = new_balls
+        previous_new_balls = new_balls.copy()
     for shape in space.shapes:  # for loop checks all balls and adds or removes them from lists.
         # if ball in gym add to checked_shapes
         if shape.body.position.y <= 600 - radius and shape not in checked_shapes and shape not in wall_shapes:
             checked_shapes.append(shape)
             changed_list = True
         # If ball above gym height add to new_balls
-        if shape.body.position.y > 600 - radius and shape not in wall_shapes:
+        if shape.body.position.y > 600 - radius and shape not in new_balls and shape not in wall_shapes:
             new_balls.append(shape)
         # If ball in new_balls and below gym height, remove from new_balls
         if shape.body.position.y < 600 and shape in new_balls:
