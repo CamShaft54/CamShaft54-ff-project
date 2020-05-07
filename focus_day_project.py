@@ -181,6 +181,7 @@ def update(dt):  # This function is called every 1/60 of a second.
             tests.append(len(checked_shapes))
             checked_shapes.clear()
             print("Test results: " + str(tests))
+            ball_cleanup = False
 
 
 if __name__ == "__main__":  # Driver code to update simulation
