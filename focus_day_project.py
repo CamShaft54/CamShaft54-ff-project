@@ -57,16 +57,17 @@ segment_shape_right_fun.elasticity = bounce
 segment_shape_right_fun.friction = 1.0
 # add gym walls to and funnel walls to wall shapes so they won't get counted multiple times or deleted.
 wall_shapes = [segment_shape_base, segment_shape_left, segment_shape_right, segment_shape_top, segment_shape_right_fun
-               , segment_shape_left_fun, segment_shape_top]
+    , segment_shape_left_fun, segment_shape_top]
 # define variables used later.
 checked_shapes = []
 new_balls = []
 previous_new_balls = []
 tests = []
 ball_spawning = False
-ball_cleanup = False
+ball_cleanup = 0
 auto = False
 timer = 0
+stop_time = 0
 # Add gym walls and funnel walls to space.
 space.add(segment_shape_base, segment_shape_left, segment_shape_right, segment_body_right, segment_shape_left_fun
           , segment_body_left_fun, segment_shape_right_fun, segment_body_right_fun)
@@ -126,23 +127,29 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
 
 
 def update(dt):  # This function is called every 1/60 of a second.
-    global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup
+    global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time
     space.step(dt)  # Step forward the physics simulation.
     changed_list = False  # Set changed_list to false (If true, print number of balls in checked_shapes).
-    if timer == 0 and auto and len(previous_new_balls) > 1:  # If auto mode is active and 2 seconds have elapsed, check for overflow.
+    # If auto mode is active and 1 second has elapsed, check for overflow.
+    if timer % 60 == 0 and auto and len(previous_new_balls) > 1:
+        stop_time = timer
         print("checking for overflow...")
         # for loop checks balls from 2 seconds ago that are above top wall with current balls above top wall.
-        print(len(previous_new_balls), len(new_balls))
         for i in range(len(previous_new_balls)):
             # Check every ball from 2 seconds ago to see if still above.
-            current_previous_ball = (round(previous_new_balls[i].body.position.x), round(previous_new_balls[i].body.position.y))
+            # Error: List index out of range
+            print("i: " + str(i), "previous_balls: " + str(len(previous_new_balls)))
+            current_previous_ball = (
+            round(previous_new_balls[i].body.position.x), round(previous_new_balls[i].body.position.y))
             for j in range(len(new_balls)):
+                print("j: " + str(j), "new_balls: " + str(len(new_balls)))
                 current_new_ball = (round(new_balls[j].body.position.x), round(new_balls[j].body.position.y))
                 print(current_previous_ball)
                 print(current_new_ball)
-                # Error: on the line below I keep getting a list index out of range error even though it should be fine.
-                if abs(current_new_ball[0] - current_previous_ball[0]) < 10 and abs(current_new_ball[1] - current_previous_ball[1]) < 10 and auto:
+                if abs(current_new_ball[0] - current_previous_ball[0]) < 50 and abs(
+                        current_new_ball[1] - current_previous_ball[1]) < 50 and auto:
                     # If so, deactivate ball_spawning, deactivate auto mode, clear new_balls, clear previous_new_balls.
+                    print("Auto mode turning off...")
                     ball_spawning = False
                     auto = False
                     new_balls.clear()
@@ -151,7 +158,11 @@ def update(dt):  # This function is called every 1/60 of a second.
                         if shape.body.position.y >= 600 and shape not in wall_shapes:
                             space.remove(shape.body, shape)
                     space.add(segment_shape_top, segment_body_top)
-                    ball_cleanup = True  # Activate ball_cleanup.
+                    ball_cleanup = 1  # Activate ball_cleanup.
+                    break
+            else:
+                continue
+            break
     timer = (timer + 1) % 120  # Progress timer forward by one.
     if timer == 1:  # Every two seconds (right after checking for overflow) set previous_new_balls equal to new_balls
         previous_new_balls = new_balls.copy()
@@ -175,20 +186,19 @@ def update(dt):  # This function is called every 1/60 of a second.
     random_ball(ball_spawning)  # Spawn a random_ball if ball_spawning is True.
     if changed_list:  # If any balls were taken away or added to checked_shapes, print checked_shapes length.
         print(str(len(checked_shapes)) + " balls")
-    if ball_cleanup:  # If ball_cleanup (after auto mode deactivated)
-        if timer == 29:  # after 30 seconds have passed since auto mode deactivation, remove top wall.
-            space.remove(segment_shape_top, segment_body_top)
-        if timer == 118:  # after 119 seconds have passed, add back top wall, remove balls above wall, add current.
-            space.add(segment_shape_top, segment_body_top)
-            for shape in space.shapes:
-                if shape.body.position.y >= 600 and shape not in wall_shapes:
-                    space.remove(shape.body, shape)
-            print("Auto mode disabled")
-        if timer == 119:  # after 120 seconds, add current number of checked_shapes to tests, print tests.
-            tests.append(len(checked_shapes))
-            checked_shapes.clear()
-            print("Test results: " + str(tests))
-            ball_cleanup = False
+    if ball_cleanup == 1 and timer == stop_time + 29 % 120:  # after 0.5 seconds have passed since auto mode deactivation, remove top wall.
+        space.remove(segment_shape_top, segment_body_top)
+        ball_cleanup += 1
+    if ball_cleanup == 2 and timer == stop_time + 119 % 120:  # after 2 seconds have passed, add back top wall, remove balls above wall, add current.
+        space.add(segment_shape_top, segment_body_top)
+        for shape in space.shapes:
+            if shape.body.position.y >= 600 and shape not in wall_shapes:
+                space.remove(shape.body, shape)
+        print("Auto mode disabled")
+        tests.append(len(checked_shapes))
+        checked_shapes.clear()
+        print("Test results: " + str(tests))
+        ball_cleanup = 0
 
 
 if __name__ == "__main__":  # Driver code to update simulation
