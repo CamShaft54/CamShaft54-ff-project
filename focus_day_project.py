@@ -68,6 +68,7 @@ ball_cleanup = 0
 auto = False
 timer = 0
 stop_time = 0
+auto_auto = False
 # Add gym walls and funnel walls to space.
 space.add(segment_shape_base, segment_shape_left, segment_shape_right, segment_body_right, segment_shape_left_fun
           , segment_body_left_fun, segment_shape_right_fun, segment_body_right_fun)
@@ -85,7 +86,7 @@ def make_ball(x, y):  # Makes ball from given coordinates and adds it to space
 
 def random_ball(status):  # Generate a random ball between the specified coordinates.
     if status:
-        make_ball(random.randint((1280 - W) / 2, (1280 - W) / 2 + W), 650)
+        make_ball(random.randint((1280 - W) / 2, (1280 - W) / 2 + W), 800)
 
 
 @window.event  # draw the space in window
@@ -101,7 +102,7 @@ def on_mouse_press(x, y, button, modifiers):  # When the mouse is clicked, add a
 
 @window.event
 def on_key_press(symbol, modifiers):  # If a key is pressed...
-    global ball_spawning, auto, new_balls
+    global ball_spawning, auto, new_balls, auto_auto
     if symbol == key.T and segment_shape_top not in space.shapes:  # If T, add the top wall if not already there.
         space.add(segment_shape_top, segment_body_top)
     elif symbol == key.T and segment_shape_top in space.shapes:  # If T, remove top wall if already there.
@@ -113,17 +114,31 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
             if shape not in wall_shapes:
                 space.remove(shape.body, shape)
         checked_shapes.clear()
+    if symbol == key.HOME:
+        auto_auto = not auto_auto
+        print("Auto Auto mode enabled")
+        if segment_shape_top in space.shapes:
+            space.remove(segment_shape_top, segment_body_top)
+        ball_spawning = not ball_spawning
+        auto = not auto
     if symbol == key.A:  # If A, activate auto mode, remove top wall if there, toggle on ball_spawning.
         print("Auto mode enabled")
         if segment_shape_top in space.shapes:
             space.remove(segment_shape_top, segment_body_top)
         ball_spawning = not ball_spawning
-        auto = True
+        if auto == True:
+            print("Final Test Results: " + str(tests))
+        auto = not auto
     if symbol == key.D:  # If D, clear all balls above top wall.
         for shape in space.shapes:
             if shape.body.position.y >= 600 and shape not in wall_shapes:
                 space.remove(shape.body, shape)
                 new_balls.remove(shape)
+    if symbol == key.F:  # If F, close window and print tests.
+        window.close()
+        while 0 in tests:
+            tests.remove(0)
+        print(tests)
 
 
 def update(dt):  # This function is called every 1/60 of a second.
@@ -140,12 +155,9 @@ def update(dt):  # This function is called every 1/60 of a second.
             # Error: List index out of range
             print("i: " + str(i), "previous_balls: " + str(len(previous_new_balls)))
             current_previous_ball = (
-            round(previous_new_balls[i].body.position.x), round(previous_new_balls[i].body.position.y))
+                round(previous_new_balls[i].body.position.x), round(previous_new_balls[i].body.position.y))
             for j in range(len(new_balls)):
-                print("j: " + str(j), "new_balls: " + str(len(new_balls)))
                 current_new_ball = (round(new_balls[j].body.position.x), round(new_balls[j].body.position.y))
-                print(current_previous_ball)
-                print(current_new_ball)
                 if abs(current_new_ball[0] - current_previous_ball[0]) < 50 and abs(
                         current_new_ball[1] - current_previous_ball[1]) < 50 and auto:
                     # If so, deactivate ball_spawning, deactivate auto mode, clear new_balls, clear previous_new_balls.
@@ -186,18 +198,30 @@ def update(dt):  # This function is called every 1/60 of a second.
     random_ball(ball_spawning)  # Spawn a random_ball if ball_spawning is True.
     if changed_list:  # If any balls were taken away or added to checked_shapes, print checked_shapes length.
         print(str(len(checked_shapes)) + " balls")
-    if ball_cleanup == 1 and timer == stop_time + 29 % 120:  # after 0.5 seconds have passed since auto mode deactivation, remove top wall.
+    if ball_cleanup == 1 and timer == (
+            stop_time + 29) % 120:  # after 0.5 seconds have passed since auto mode deactivation, remove top wall.
         space.remove(segment_shape_top, segment_body_top)
         ball_cleanup += 1
-    if ball_cleanup == 2 and timer == stop_time + 119 % 120:  # after 2 seconds have passed, add back top wall, remove balls above wall, add current.
+        print("Removed wall")
+        print((stop_time + 119) % 120)
+    if ball_cleanup == 2 and timer == (
+            stop_time + 119) % 120:  # after 2 seconds have passed, add back top wall, remove balls above wall, add current.
         space.add(segment_shape_top, segment_body_top)
         for shape in space.shapes:
             if shape.body.position.y >= 600 and shape not in wall_shapes:
                 space.remove(shape.body, shape)
-        print("Auto mode disabled")
+        print("Added Wall")
+        ball_cleanup += 1
+    if ball_cleanup == 3 and timer == (stop_time - 30) % 120:
         tests.append(len(checked_shapes))
         checked_shapes.clear()
         print("Test results: " + str(tests))
+        if auto_auto:
+            for shape in space.shapes:
+                if shape not in wall_shapes or shape == segment_shape_top:
+                    space.remove(shape, shape.body)
+            ball_spawning = not ball_spawning
+            auto = True
         ball_cleanup = 0
 
 
