@@ -4,6 +4,9 @@ from pymunk.pyglet_util import DrawOptions
 from pyglet.window import key
 import random
 
+# Prompt user to select number of tests
+tests_num = int(input("Enter the number of tests you want to run (0 means you don't care): "))
+
 # Prompt user to enter Height and Width in pixels, radius of circles, and define mass and bounce/elasticity.
 H = int(input("Enter Height of Gym: "))
 W = int(input("Enter Width of Gym: "))
@@ -102,7 +105,7 @@ def on_mouse_press(x, y, button, modifiers):  # When the mouse is clicked, add a
 
 @window.event
 def on_key_press(symbol, modifiers):  # If a key is pressed...
-    global ball_spawning, auto, new_balls, auto_auto
+    global ball_spawning, auto, new_balls, auto_auto, ball_cleanup
     if symbol == key.T and segment_shape_top not in space.shapes:  # If T, add the top wall if not already there.
         space.add(segment_shape_top, segment_body_top)
     elif symbol == key.T and segment_shape_top in space.shapes:  # If T, remove top wall if already there.
@@ -116,6 +119,7 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
         checked_shapes.clear()
     if symbol == key.HOME:
         auto_auto = not auto_auto
+        ball_cleanup = 0
         print("Auto Auto mode enabled")
         if segment_shape_top in space.shapes:
             space.remove(segment_shape_top, segment_body_top)
@@ -126,7 +130,7 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
         if segment_shape_top in space.shapes:
             space.remove(segment_shape_top, segment_body_top)
         ball_spawning = not ball_spawning
-        if auto == True:
+        if auto:
             print("Final Test Results: " + str(tests))
         auto = not auto
     if symbol == key.D:  # If D, clear all balls above top wall.
@@ -134,17 +138,30 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
             if shape.body.position.y >= 600 and shape not in wall_shapes:
                 space.remove(shape.body, shape)
                 new_balls.remove(shape)
+    if symbol == key.R:  # if R, manually record number of balls in gym to tests.
+        tests.append(len(checked_shapes))
+        print("Tests: " + str(tests))
     if symbol == key.F:  # If F, close window and print tests.
+        auto_auto = False
+        auto = False
+        ball_spawning = False
         window.close()
-        while 0 in tests:
-            tests.remove(0)
         print(tests)
 
 
 def update(dt):  # This function is called every 1/60 of a second.
-    global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time
+    global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time, auto_auto
     space.step(dt)  # Step forward the physics simulation.
     changed_list = False  # Set changed_list to false (If true, print number of balls in checked_shapes).
+    while 0 in tests:  # Remove 0's in tests.
+        tests.remove(0)
+    # If user specified number of tests and that number has been achieved, close the window and print results.
+    if len(tests) == tests_num and tests_num != 0:
+        window.close()
+        auto_auto = False
+        auto = False
+        ball_spawning = False
+        print(tests)
     # If auto mode is active and 1 second has elapsed, check for overflow.
     if timer % 60 == 0 and auto and len(previous_new_balls) > 1:
         stop_time = timer
@@ -205,14 +222,14 @@ def update(dt):  # This function is called every 1/60 of a second.
         print("Removed wall")
         print((stop_time + 119) % 120)
     if ball_cleanup == 2 and timer == (
-            stop_time + 119) % 120:  # after 2 seconds have passed, add back top wall, remove balls above wall, add current.
+            stop_time + 119) % 120:  # after 2 seconds have passed, add top wall, remove balls above wall.
         space.add(segment_shape_top, segment_body_top)
         for shape in space.shapes:
             if shape.body.position.y >= 600 and shape not in wall_shapes:
                 space.remove(shape.body, shape)
         print("Added Wall")
         ball_cleanup += 1
-    if ball_cleanup == 3 and timer == (stop_time - 30) % 120:
+    if ball_cleanup == 3 and timer == (stop_time - 30) % 120:  # after 3.5(?), log tests and restart auto if auto_auto.
         tests.append(len(checked_shapes))
         checked_shapes.clear()
         print("Test results: " + str(tests))
