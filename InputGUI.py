@@ -20,7 +20,7 @@ def instructions():
             "R: Record, manually record the current number of balls in gyms and add value to the final tests list.")],
         [Sg.Text("T: Toggle Top Wall, adds or removes the top wall of the gym.")],
         [Sg.Text("Mouse Click: Spawns ball at mouse coordinate.")],
-        [Sg.Button('Hello', key='instructions_continue'), Sg.Cancel()]
+        [Sg.Button('Continue', key='instructions_continue'), Sg.Cancel()]
     ]
     instructions_window = Sg.Window('Welcome', instructions_layout)
     while True:

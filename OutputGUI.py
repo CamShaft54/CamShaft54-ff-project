@@ -4,7 +4,7 @@ from focus_day_project import tests
 
 names = []
 for i in range(len(tests)):
-    names.append("Sim. #" + str(i))
+    names.append("Sim. #" + str(i+1))
 
 
 def draw_plot():
