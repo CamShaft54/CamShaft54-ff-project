@@ -7,12 +7,12 @@ from playsound import playsound
 import random
 
 # Prompt user to select number of tests
-tests_num = int(input("Enter the number of tests you want to run (0 means you don't care): "))
+tests_num = user_input[2]
 
 # Prompt user to enter Height and Width in pixels, radius of circles, and define mass and bounce/elasticity.
-H = int(input("Enter Height of Gym: "))
-W = int(input("Enter Width of Gym: "))
-radius = int(input("Enter Radius of Ball: "))
+H = user_input[1]
+W = user_input[0]
+radius = user_input[3]
 mass = 1
 bounce = 0
 # Given H and W of gym define coordinates of corners.
@@ -283,6 +283,6 @@ def update(dt):  # This function is called every 1/60 of a second.
         ball_cleanup = 0
 
 
-if __name__ == "__main__":  # Driver code to update simulation
-    pyglet.clock.schedule_interval(update, 1.0 / 60)
-    pyglet.app.run()
+# Driver code to update simulation
+pyglet.clock.schedule_interval(update, 1.0 / 60)
+pyglet.app.run()

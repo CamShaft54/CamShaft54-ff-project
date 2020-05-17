@@ -12,7 +12,7 @@ def draw_plot():
     plt.show(block=False)
 
 
-layout = [[Sg.Button('Show Graph'), Sg.Cancel()]]
+layout = [[Sg.Text("Simulation Complete!")], [Sg.Button('Show Graph'), Sg.Cancel()]]
 
 window = Sg.Window('Final Results', layout)
 

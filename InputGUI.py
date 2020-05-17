@@ -1,4 +1,6 @@
 import PySimpleGUI as Sg
+import time
+import sys
 
 
 def instructions():
@@ -23,10 +25,12 @@ def instructions():
     instructions_window = Sg.Window('Welcome', instructions_layout)
     while True:
         event, values = instructions_window.read()
-        if event in (None, 'Cancel'):
-            break
         if event == 'instructions_continue':
             instructions_window.close()
+            break
+        if event in (None, 'Cancel'):
+            print("exiting...")
+            sys.exit()
 
 
 def input_window():
@@ -43,18 +47,17 @@ def input_window():
     while True:
         event, values = input_win.read()
         if event in (None, 'Cancel'):
-            break
+            sys.exit()
         if event == 'submit':
             print("Submit input window")
+            input_win.close()
             if values['m']:
-                return [int(float(values['width']) * 1000), int(float(values['height']) * 1000), int(float(values['length']) * 1000)
-                        , int(float(values['softball']) * 1000)]
+                return [int(float(values['width']) * 1000), int(float(values['height']) * 1000),
+                        int(float(values['length']) * 1000)
+                    , int(float(values['softball']) * 1000)]
             return [int(values['width']), int(values['height']), int(values['length']), int(values['softball'])]
 
 
-if __name__ == "__main__":
-    instructions()
-    user_input = input_window()
-    print(user_input)
-    print(user_input)
-user_input = None
+instructions()
+print("open window")
+user_input = input_window()
