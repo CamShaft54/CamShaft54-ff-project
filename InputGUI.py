@@ -31,9 +31,12 @@ def instructions():
 
 def input_window():
     input_layout = [
-        [Sg.Text("Width of Gym: "), Sg.Input("800", key='width'), Sg.Text("Height of Gym"),
-         Sg.Input("500", key='height')],
-        [Sg.Text("Softball Radius: "), Sg.Input("25", key='softball')],
+        [Sg.Text("Units: "), Sg.Radio("Meters", group_id='units', key='m', default=True),
+         Sg.Radio("Pixels", group_id='units', key='p')],
+        [Sg.Text("Width of Gym: "), Sg.Input("15", key='width'), Sg.Text("Height of Gym"),
+         Sg.Input("7", key='height')],
+        [Sg.Text("Length of Gym: "), Sg.Input("28", key='length')],
+        [Sg.Text("Softball Radius: "), Sg.Input("0.7", key='softball')],
         [Sg.Button("Submit", key='submit'), Sg.Cancel()]
     ]
     input_win = Sg.Window('Input', input_layout)
@@ -43,11 +46,15 @@ def input_window():
             break
         if event == 'submit':
             print("Submit input window")
-            return [int(values['width']), int(values['height']), int(values['softball'])]
+            if values['m']:
+                return [int(float(values['width']) * 500), int(float(values['height']) * 500), int(float(values['length']) * 500)
+                        , int(float(values['softball']) * 500)]
+            return [int(values['width']), int(values['height']), int(values['length']) * 500, int(values['softball'])]
 
 
 if __name__ == "__main__":
     instructions()
     user_input = input_window()
+    print(user_input)
     print(user_input)
 user_input = None
