@@ -47,9 +47,9 @@ def input_window():
         if event == 'submit':
             print("Submit input window")
             if values['m']:
-                return [int(float(values['width']) * 500), int(float(values['height']) * 500), int(float(values['length']) * 500)
-                        , int(float(values['softball']) * 500)]
-            return [int(values['width']), int(values['height']), int(values['length']) * 500, int(values['softball'])]
+                return [int(float(values['width']) * 1000), int(float(values['height']) * 1000), int(float(values['length']) * 1000)
+                        , int(float(values['softball']) * 1000)]
+            return [int(values['width']), int(values['height']), int(values['length']), int(values['softball'])]
 
 
 if __name__ == "__main__":
