@@ -84,11 +84,11 @@ segment_shape_right_fun.elasticity = bounce
 segment_shape_right_fun.friction = 1.0
 
 # add gym walls to and funnel walls to wall shapes so they won't get counted multiple times or deleted.
-wall_shapes = [segment_shape_base, segment_shape_left, segment_shape_right, segment_shape_top, segment_shape_right_fun
-               , segment_shape_left_fun, segment_shape_top]
+wall_shapes = [segment_shape_base, segment_shape_left, segment_shape_right, segment_shape_top, segment_shape_right_fun,
+               segment_shape_left_fun, segment_shape_top]
 # Add gym walls and funnel walls to space.
-space.add(segment_shape_base, segment_shape_left, segment_shape_right, segment_body_right, segment_shape_left_fun
-          , segment_body_left_fun, segment_shape_right_fun, segment_body_right_fun)
+space.add(segment_shape_base, segment_shape_left, segment_shape_right, segment_body_right, segment_shape_left_fun,
+          segment_body_left_fun, segment_shape_right_fun, segment_body_right_fun)
 
 # define variables used later.
 checked_shapes = []
@@ -142,11 +142,13 @@ def on_draw():
     space.debug_draw(options)
 
 
+# noinspection PyUnusedLocal
 @window.event
 def on_mouse_press(x, y, button, modifiers):  # When the mouse is clicked, add a new shape to space at mouse coords.
     make_ball(x * 14.285, y * 14.285)
 
 
+# noinspection PyUnusedLocal
 @window.event
 def on_key_press(symbol, modifiers):  # If a key is pressed...
     global ball_spawning, auto, new_balls, auto_auto, ball_cleanup, tests, speedup, timer_length
@@ -179,8 +181,6 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
         if segment_shape_top in space.shapes:
             space.remove(segment_shape_top, segment_body_top)
         ball_spawning = not ball_spawning
-        if auto:
-            print("Final Test Results: " + str(tests))
         auto = not auto
 
     if symbol == key.D:  # If D, clear all balls above top wall.
@@ -191,14 +191,14 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
 
     if symbol == key.R:  # if R, manually record number of balls in gym to tests.
         tests.append(len(checked_shapes))
-        print("Tests: " + str(tests))
+        print("Manually recorded test: " + str(len(checked_shapes)))
 
     if symbol == key.F:  # If F, close window and print tests.
         auto_auto = False
         auto = False
         ball_spawning = False
         window.close()
-        print(tests)
+        print("Final test results: " + str(tests))
 
     if symbol == key.S:
         if speedup == 0:
@@ -213,7 +213,7 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
 
 
 def update(dt):  # This function is called every 1/60 of a second.
-    global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time,\
+    global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time, \
         auto_auto, tests
     space.step(dt + speedup)  # Step forward the physics simulation.
     changed_list = False  # Set changed_list to false (If true, print number of balls in checked_shapes).
@@ -227,7 +227,7 @@ def update(dt):  # This function is called every 1/60 of a second.
         auto_auto = False
         auto = False
         ball_spawning = False
-        print(tests)
+        print("Final test results: " + str(tests))
 
     timer = (timer + 1) % timer_length  # Progress timer forward by one.
 
@@ -256,12 +256,11 @@ def update(dt):  # This function is called every 1/60 of a second.
     # If auto mode is active and 1 second has elapsed, check for overflow.
     if timer % timer_length == 0 and auto and len(previous_new_balls) > 1:
         stop_time = timer
-        print("checking for overflow...")
+        print("checking for auto mode overflow...")
         # for loop checks balls from 2 seconds ago that are above top wall with current balls above top wall.
         for i in range(len(previous_new_balls)):
             # Check every ball from 2 seconds ago to see if still above.
             # Error: List index out of range
-            print("i: " + str(i), "previous_balls: " + str(len(previous_new_balls)))
             current_previous_ball = (
                 round(previous_new_balls[i].body.position.x), round(previous_new_balls[i].body.position.y))
             for j in range(len(new_balls)):
@@ -291,8 +290,6 @@ def update(dt):  # This function is called every 1/60 of a second.
     if ball_cleanup == 1 and timer == (stop_time + 29) % timer_length:
         space.remove(segment_shape_top, segment_body_top)
         ball_cleanup += 1
-        print("Removed wall")
-        print((stop_time + 119) % timer_length)
     # after 2 seconds have passed, add top wall, remove balls above wall.
     if ball_cleanup == 2 and timer == (
             stop_time + 119) % timer_length:
@@ -300,7 +297,6 @@ def update(dt):  # This function is called every 1/60 of a second.
         for shape in space.shapes:
             if shape.body.position.y >= 8571 and shape not in wall_shapes:
                 space.remove(shape.body, shape)
-        print("Added Wall")
         ball_cleanup += 1
     # after 3.5(?) seconds have elapsed, log tests and restart auto if auto_auto.
     if ball_cleanup == 3 and timer == (

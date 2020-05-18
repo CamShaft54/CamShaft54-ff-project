@@ -1,5 +1,4 @@
 import PySimpleGUI as Sg
-import time
 import sys
 
 '''DO NOT RUN THIS PROGRAM! RUN OutputGUI.py INSTEAD!'''
