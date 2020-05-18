@@ -213,7 +213,8 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
 
 
 def update(dt):  # This function is called every 1/60 of a second.
-    global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time, auto_auto, tests
+    global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time,\
+        auto_auto, tests
     space.step(dt + speedup)  # Step forward the physics simulation.
     changed_list = False  # Set changed_list to false (If true, print number of balls in checked_shapes).
 
