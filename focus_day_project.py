@@ -17,11 +17,13 @@ W = user_input[0]
 radius = user_input[3]
 mass = 1
 bounce = 0
+
 # Given H and W of gym define coordinates of corners.
 Bottom_Left_Corner = ((18285 - W) // 2, 8571 - H)
 Bottom_Right_Corner = ((18285 - W) // 2 + W, 8571 - H)
 Top_Left_Corner = ((18285 - W) // 2, 8571)
 Top_Right_Corner = ((18285 - W) // 2 + W, 8571)
+
 # Create Pyglet Window
 window = pyglet.window.Window(1280, 720, "Softballs in the Gym Simulation", resizable=False)
 background = pyglet.image.load('Background.png')
@@ -30,21 +32,25 @@ background_sprite.scale_y = 43
 background_sprite.scale_x = 61
 options = DrawOptions()
 glScalef(0.07, 0.07, 0.07)
+
 # Declare space to put bodies/shapes in, define gravity.
 space = pymunk.Space()
 space.gravity = 0, -7000
+
 # Make gym base
 segment_shape_base = pymunk.Segment(space.static_body, (0, 0), (W, 0), 50)
 segment_shape_base.color = (118, 82, 19, 0.69)
 segment_shape_base.body.position = Bottom_Left_Corner
 segment_shape_base.elasticity = bounce
 segment_shape_base.friction = 1.0
+
 # Make gym left wall
 segment_shape_left = pymunk.Segment(space.static_body, (0, H), (0, 0), 50)
 segment_shape_left.color = (118, 82, 19, 0.69)
 segment_shape_left.body.position = Bottom_Left_Corner
 segment_shape_left.elasticity = bounce
 segment_shape_left.friction = 1.0
+
 # Make gym right wall
 segment_body_right = pymunk.Body(body_type=pymunk.Body.STATIC)
 segment_body_right.position = Bottom_Right_Corner
@@ -52,6 +58,7 @@ segment_shape_right = pymunk.Segment(segment_body_right, (0, H), (0, 0), 50)
 segment_shape_right.color = (118, 82, 19, 0.69)
 segment_shape_right.elasticity = bounce
 segment_shape_right.friction = 1.0
+
 # Make gym top wall
 segment_body_top = pymunk.Body(body_type=pymunk.Body.STATIC)
 segment_body_top.position = Top_Left_Corner
@@ -59,6 +66,7 @@ segment_shape_top = pymunk.Segment(segment_body_top, (0, 0), (W, 0), 50)
 segment_shape_top.color = (118, 82, 19, 0.69)
 segment_shape_top.elasticity = bounce
 segment_shape_top.friction = 1.0
+
 # Make left funnel
 segment_body_left_fun = pymunk.Body(body_type=pymunk.Body.STATIC)
 segment_body_left_fun.position = 0, 0
@@ -66,6 +74,7 @@ segment_shape_left_fun = pymunk.Segment(segment_body_left_fun, (0, 10285), Top_L
 segment_shape_left_fun.color = (118, 82, 19, 0.69)
 segment_shape_left_fun.elasticity = bounce
 segment_shape_left_fun.friction = 1.0
+
 # Make right funnel
 segment_body_right_fun = pymunk.Body(body_type=pymunk.Body.STATIC)
 segment_body_right_fun.position = 0, 0
@@ -73,9 +82,14 @@ segment_shape_right_fun = pymunk.Segment(segment_body_right_fun, (18285, 10285),
 segment_shape_right_fun.color = (118, 82, 19, 0.69)
 segment_shape_right_fun.elasticity = bounce
 segment_shape_right_fun.friction = 1.0
+
 # add gym walls to and funnel walls to wall shapes so they won't get counted multiple times or deleted.
 wall_shapes = [segment_shape_base, segment_shape_left, segment_shape_right, segment_shape_top, segment_shape_right_fun
                , segment_shape_left_fun, segment_shape_top]
+# Add gym walls and funnel walls to space.
+space.add(segment_shape_base, segment_shape_left, segment_shape_right, segment_body_right, segment_shape_left_fun
+          , segment_body_left_fun, segment_shape_right_fun, segment_body_right_fun)
+
 # define variables used later.
 checked_shapes = []
 new_balls = []
@@ -89,9 +103,6 @@ stop_time = 0
 auto_auto = False
 timer_length = 120
 speedup = 0
-# Add gym walls and funnel walls to space.
-space.add(segment_shape_base, segment_shape_left, segment_shape_right, segment_body_right, segment_shape_left_fun
-          , segment_body_left_fun, segment_shape_right_fun, segment_body_right_fun)
 
 
 def make_ball(x, y):  # Makes ball from given coordinates and adds it to space
@@ -139,17 +150,21 @@ def on_mouse_press(x, y, button, modifiers):  # When the mouse is clicked, add a
 @window.event
 def on_key_press(symbol, modifiers):  # If a key is pressed...
     global ball_spawning, auto, new_balls, auto_auto, ball_cleanup, tests, speedup, timer_length
+
     if symbol == key.T and segment_shape_top not in space.shapes:  # If T, add the top wall if not already there.
         space.add(segment_shape_top, segment_body_top)
     elif symbol == key.T and segment_shape_top in space.shapes:  # If T, remove top wall if already there.
         space.remove(segment_shape_top.body, segment_shape_top)
+
     if symbol == key.B:  # If B, toggle ball_spawning variable (controls random_ball function called in update).
         ball_spawning = not ball_spawning
+
     if symbol == key.C:  # If C, clear all balls.
         for shape in space.shapes:
             if shape not in wall_shapes:
                 space.remove(shape.body, shape)
         checked_shapes.clear()
+
     if symbol == key.Q:
         auto_auto = not auto_auto
         ball_cleanup = 0
@@ -158,6 +173,7 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
             space.remove(segment_shape_top, segment_body_top)
         ball_spawning = not ball_spawning
         auto = not auto
+
     if symbol == key.A:  # If A, activate auto mode, remove top wall if there, toggle on ball_spawning.
         print("Auto mode enabled")
         if segment_shape_top in space.shapes:
@@ -166,20 +182,24 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
         if auto:
             print("Final Test Results: " + str(tests))
         auto = not auto
+
     if symbol == key.D:  # If D, clear all balls above top wall.
         for shape in space.shapes:
             if shape.body.position.y >= 8571 and shape not in wall_shapes:
                 space.remove(shape.body, shape)
                 new_balls.remove(shape)
+
     if symbol == key.R:  # if R, manually record number of balls in gym to tests.
         tests.append(len(checked_shapes))
         print("Tests: " + str(tests))
+
     if symbol == key.F:  # If F, close window and print tests.
         auto_auto = False
         auto = False
         ball_spawning = False
         window.close()
         print(tests)
+
     if symbol == key.S:
         if speedup == 0:
             speedup = 0.05
@@ -187,6 +207,7 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
         else:
             speedup = 0
             timer_length = 120
+
     if symbol == key.GRAVE:
         playsound("noise.mp3", False)
 
@@ -195,8 +216,10 @@ def update(dt):  # This function is called every 1/60 of a second.
     global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time, auto_auto, tests
     space.step(dt + speedup)  # Step forward the physics simulation.
     changed_list = False  # Set changed_list to false (If true, print number of balls in checked_shapes).
+
     if len(tests) > 1:
         tests = cleanup_tests().copy()  # Remove outliers from tests.
+
     # If user specified number of tests and that number has been achieved, close the window and print results.
     if len(tests) == tests_num and tests_num != 0:
         window.close()
@@ -204,7 +227,9 @@ def update(dt):  # This function is called every 1/60 of a second.
         auto = False
         ball_spawning = False
         print(tests)
+
     timer = (timer + 1) % timer_length  # Progress timer forward by one.
+
     for shape in space.shapes:  # for loop checks all balls and adds or removes them from lists.
         # if ball in gym add to checked_shapes
         if shape.body.position.y <= 8571 - radius and shape not in checked_shapes and shape not in wall_shapes:
@@ -222,9 +247,11 @@ def update(dt):  # This function is called every 1/60 of a second.
                 checked_shapes.remove(shape)
             space.remove(shape.body, shape)
             changed_list = True
-    random_ball(ball_spawning)  # Spawn a random_ball if ball_spawning is True.
     if changed_list:  # If any balls were taken away or added to checked_shapes, print checked_shapes length.
         print(str(len(checked_shapes)) + " balls")
+
+    random_ball(ball_spawning)  # Spawn a random_ball if ball_spawning is True.
+
     # If auto mode is active and 1 second has elapsed, check for overflow.
     if timer % timer_length == 0 and auto and len(previous_new_balls) > 1:
         stop_time = timer
@@ -255,24 +282,28 @@ def update(dt):  # This function is called every 1/60 of a second.
             else:
                 continue
             break
+
     if timer == 1:  # Every two seconds (right after checking for overflow) set previous_new_balls equal to new_balls
         previous_new_balls = new_balls.copy()
-    if ball_cleanup == 1 and timer == (
-            stop_time + 29) % timer_length:  # after 0.5 seconds have passed since auto mode deactivation, remove top wall.
+
+    # after 0.5 seconds have passed since auto mode deactivation, remove top wall.
+    if ball_cleanup == 1 and timer == (stop_time + 29) % timer_length:
         space.remove(segment_shape_top, segment_body_top)
         ball_cleanup += 1
         print("Removed wall")
         print((stop_time + 119) % timer_length)
+    # after 2 seconds have passed, add top wall, remove balls above wall.
     if ball_cleanup == 2 and timer == (
-            stop_time + 119) % timer_length:  # after 2 seconds have passed, add top wall, remove balls above wall.
+            stop_time + 119) % timer_length:
         space.add(segment_shape_top, segment_body_top)
         for shape in space.shapes:
             if shape.body.position.y >= 8571 and shape not in wall_shapes:
                 space.remove(shape.body, shape)
         print("Added Wall")
         ball_cleanup += 1
+    # after 3.5(?) seconds have elapsed, log tests and restart auto if auto_auto.
     if ball_cleanup == 3 and timer == (
-            stop_time - 30) % timer_length:  # after 3.5(?), log tests and restart auto if auto_auto.
+            stop_time - 30) % timer_length:
         tests.append(len(checked_shapes))
         checked_shapes.clear()
         print("Test results: " + str(tests))
