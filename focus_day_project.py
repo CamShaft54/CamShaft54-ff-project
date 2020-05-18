@@ -6,6 +6,8 @@ from pyglet.gl import *
 from playsound import playsound
 import random
 
+'''DO NOT RUN THIS PROGRAM! RUN OutputGUI.py INSTEAD!'''
+
 # Prompt user to select number of tests
 tests_num = user_input[2]
 
@@ -117,7 +119,7 @@ def cleanup_tests():
     if len(tests_without_zeros) > 1:
         average = tests_without_zeros[0]
         for i in range(len(tests_without_zeros)):
-            if 1.07 > tests_without_zeros[i] / average > 0.94:
+            if tests_without_zeros[i] / average >= 0.94:
                 result.append(tests_without_zeros[i])
     return result
 
@@ -148,7 +150,7 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
             if shape not in wall_shapes:
                 space.remove(shape.body, shape)
         checked_shapes.clear()
-    if symbol == key.HOME:
+    if symbol == key.Q:
         auto_auto = not auto_auto
         ball_cleanup = 0
         print("Auto Auto mode enabled")
