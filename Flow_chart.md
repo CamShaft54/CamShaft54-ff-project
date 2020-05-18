@@ -1,26 +1,36 @@
 # Project Flow Chart
 
-1. User presses run button on ``Input.py``
-2. PySimpleGUI window will open with instructions on what the program does and how to use it.
-3. After user closes the first window, a second window will open that will allow the user to enter the size of the gym
-(in pixels or meters), the size of the ball (in pixels or centimeters), the user will then choose between showing the
-simulation (Option A) or doing it faster behind the scenes (Option B).
+To start the program the user presses the run button on ``OutputGUI.py``. Next an chain of import statements will
+start the user at ```InputGUI.py```.
 
-## Option A
-1. After the user presses submit in the input window, a pyglet window will open from ``Simulation.py``.
-2. Inside the window will be two diagonal lines that funnel the ball into an open box.
-3. If the user left clicks somewhere in the window, it will spawn a ball at the position.
-4. If the user presses ``B`` balls will randomly spawn over the gym until the user presses ``B`` again.
-5. If the user presses ``C`` all the balls in the window will be cleared.
-6. If the user presses ``T`` a top wall of the gym will be toggled on or off.
-7. If the user presses ``D`` all the balls above the top wall will be removed.
-8. If the user presses ``A`` auto mode will be activated. This mode will spawn balls randomly (Similarly to pressing``B``)
-but will stop when the balls go above the height of the gym. When this happens, the top wall will appear, the balls above
-the top wall will be removed, and the number of all balls in the gym will be added to the ``Tests`` array.
-9. If the user presses ``M`` the number of balls below the height of the gym will be added to the ``Tests`` array.
-10. If the user presses ``F`` the window will close and a PySimpleGUI window with MatPlotLib will open and display a bar
-graph showing the results of each test from ``Tests``. 
+InputGUI.py
+-
+PySimpleGUI window from ``InputGUI.py`` will open with instructions on what the program does and how to use it.
+After the user closes the first window, a second window will open that will allow the user to enter the size of the gym
+(in pixels or meters), the size of the ball (in pixels or meters).
 
-## Option B
-1. When the user presses submit in the input window, the window will close.
-2. Another window will open showing the results of each test in a MatPlotLib bar graph.
+focus_day_project.py
+-
+After the user presses submit in the input window, a pyglet window will open from ``focus_day_project.py``. Inside
+the window will be two diagonal lines that funnel the ball into an open box. This is done by making 5 different
+bodies and assigning each one to a shape.
+#### Mouse and Key presses
+In order to use keyboard shortcuts and mouse clicks the ```on_mouse_press``` and ```on_key_press``` functions are used.
+Some keyboard shortcuts will delete balls by clearing them from the space, others will activate auto mode and auto auto mode.
+Other keyboard shortcuts can be used to manually run simulation, for example clicking the mouse will spawn a ball, pressing "R" 
+will manually record the number of balls in the box.
+#### Update Function
+In order to have the simulation do stuff, the ```update``` function is used. This steps the simulation forward,
+if ball spawning is on, spawns balls, if auto mode is on, checks for overflow by comparing two lists every 2 seconds, and if
+the overflow shutoff is triggered, it puts the top wall on top of the gym, deletes the balls above, removes the top wall,
+then puts it back and deletes the balls above and counts the balls inside the box. This is done to eliminate issues with
+cramming too many balls inside the gym to make the simulation more like a real life situation.
+#### Tests List
+At the end of each round of simulation, the number of balls in the gym (stored in checked_shapes) is appended to the ```tests```
+list. In the ```update``` function another function is called which removes outliers in the list.
+
+OutputGUI.py
+-
+Finally after the simulation is finished, the window will close and the tests array will be passed to OutputGUI.py. This
+script defines a function that will create a bar graph of all the simulation recorded. A PySimpleGUI window will also be
+created that contains the total number of balls that could fit in the gym and the average number of balls per simulation.
