@@ -17,7 +17,7 @@ def draw_plot():  # Make bar graph
 layout = [  # Layout of output window
           [Sg.Text("Simulation Complete!")],
           [Sg.Text("Average ball count: " + str(round(sum(tests)/len(tests)))),
-           Sg.Text("\nTotal ball count: " + str(sum(tests)))],
+           Sg.Text("Total ball count: " + str(sum(tests)))],
           [Sg.Button('Show Graph'), Sg.Cancel()]
 ]
 

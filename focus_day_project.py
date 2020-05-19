@@ -215,7 +215,7 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
 def update(dt):  # This function is called every 1/60 of a second.
     global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time, \
         auto_auto, tests
-    space.step(dt + speedup)  # Step forward the physics simulation.
+    space.step(dt + speedup)  # Step forward the physics simulation, speedup simulation if user specified.
     changed_list = False  # Set changed_list to false (If true, print number of balls in checked_shapes).
 
     if len(tests) > 1:
@@ -254,19 +254,19 @@ def update(dt):  # This function is called every 1/60 of a second.
     random_ball(ball_spawning)  # Spawn a random_ball if ball_spawning is True.
 
     # If auto mode is active and 1 second has elapsed, check for overflow.
-    if timer % timer_length == 0 and auto and len(previous_new_balls) > 1:
+    if (timer % timer_length == 0 or timer % timer_length == 60) and auto and len(previous_new_balls) > 1:
         stop_time = timer
         print("checking for auto mode overflow...")
         # for loop checks balls from 2 seconds ago that are above top wall with current balls above top wall.
         for i in range(len(previous_new_balls)):
-            # Check every ball from 2 seconds ago to see if still above.
+            # Check every ball from 2 seconds ago to see if still above and within 200px of previous coordinate.
             # Error: List index out of range
             current_previous_ball = (
                 round(previous_new_balls[i].body.position.x), round(previous_new_balls[i].body.position.y))
             for j in range(len(new_balls)):
                 current_new_ball = (round(new_balls[j].body.position.x), round(new_balls[j].body.position.y))
-                if abs(current_new_ball[0] - current_previous_ball[0]) < 50 and abs(
-                        current_new_ball[1] - current_previous_ball[1]) < 50 and auto:
+                if abs(current_new_ball[0] - current_previous_ball[0]) <= 200 and abs(
+                        current_new_ball[1] - current_previous_ball[1]) <= 200 and auto:
                     # If so, deactivate ball_spawning, deactivate auto mode, clear new_balls, clear previous_new_balls.
                     print("Auto mode turning off...")
                     ball_spawning = False
@@ -282,8 +282,8 @@ def update(dt):  # This function is called every 1/60 of a second.
             else:
                 continue
             break
-
-    if timer == 1:  # Every two seconds (right after checking for overflow) set previous_new_balls equal to new_balls
+    # Every two seconds (right after checking for overflow) set previous_new_balls equal to new_balls
+    if timer == 1 or timer % timer_length == 60:
         previous_new_balls = new_balls.copy()
 
     # after 0.5 seconds have passed since auto mode deactivation, remove top wall.
@@ -303,6 +303,8 @@ def update(dt):  # This function is called every 1/60 of a second.
             stop_time - 30) % timer_length:
         tests.append(len(checked_shapes))
         checked_shapes.clear()
+        new_balls.clear()
+        previous_new_balls.clear()
         print("Test results: " + str(tests))
         if auto_auto:
             for shape in space.shapes:
