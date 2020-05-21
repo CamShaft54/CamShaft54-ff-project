@@ -38,10 +38,12 @@ def instructions():  # Make instructions window
 
 def input_window():  # Create an Input Window
     input_layout = [  # Define layout of input window.
-        [Sg.Text("The width and height are the two values used to make the 2d gym in the simulation.")],
+        [Sg.Text("The width and height are the two values used to make the 2D gym in the simulation.")],
         [Sg.Text("The number of simulations is determined by the length and radius of the softball.")],
-        [Sg.Text("If you are unsure of what to do, just use the default values already entered.")],
-        [Sg.Text("Also, when the simulation opens, try pressing the ` key (top left of keyboard).")],
+        [Sg.Text("If you are unsure of what to do, just use the default values already entered")],
+        [Sg.Text("and press the Q key to start the auto simulation. If you don't want to wait a long time")],
+        [Sg.Text(" change the length of the gym to a smaller number. Also, when the simulation opens,")],
+        [Sg.Text("try pressing the ` key (top left of keyboard).")],
         [Sg.Text("Units: "), Sg.Radio("Meters", group_id='units', key='m', default=True),
          Sg.Radio("Pixels", group_id='units', key='p')],
         [Sg.Text("Width of Gym: "), Sg.Input("15", key='width', size=(5, 1)), Sg.Text("Height of Gym"),
