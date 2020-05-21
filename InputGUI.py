@@ -1,7 +1,7 @@
 import PySimpleGUI as Sg
 import sys
 
-'''DO NOT RUN THIS PROGRAM! RUN OutputGUI.py INSTEAD!'''
+"""DO NOT RUN THIS PROGRAM! RUN OutputGUI.py INSTEAD!"""
 
 
 def instructions():  # Make instructions window
