@@ -19,6 +19,6 @@ Citations
 Bugs
 -
 1. If the user creates a ball with a radius smaller than 0.35m the simulator will glitch because it cannot handle that many
-balls.
+balls, to avoid this don't use enter a ball smaller than that.
 2. If the user uses auto mode or auto auto mode, sometimes the box will only fill up 10% with balls before shutting off. This has
-temporarily been fixed by removing these outliers from the program.
+temporarily been fixed by removing these outliers from the program, if it is shutting off early, just ignore it.
