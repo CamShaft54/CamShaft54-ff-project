@@ -1,4 +1,5 @@
-# Project Description
+###### Written by Cameron S., Class of 2023
+
 #### Focus Day: Softballs in the Gym Day
 In this project I wanted to make a program that would run simulations of randomly dropping softballs (circles) into
 a gym (box). I did this by using the height and width given as the size of the "gym". Then I ran that simulations multiple
