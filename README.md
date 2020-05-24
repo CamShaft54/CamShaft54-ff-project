@@ -1,4 +1,5 @@
 ###### Written by Cameron S., Class of 2023
+[![Run on Repl.it](https://repl.it/badge/github/athenian-ct-projects/CamShaft54-ff-project)](https://repl.it/github/athenian-ct-projects/CamShaft54-ff-project)
 
 ## Focus Day: Softballs in the Gym Day
 In this project I wanted to make a program that would run simulations of randomly dropping softballs (circles) into
