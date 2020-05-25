@@ -1,4 +1,5 @@
 import random
+import sys
 """DO NOT RUN THIS PROGRAM! RUN OutputGUI.py INSTEAD!"""
 
 
@@ -138,3 +139,4 @@ if saves == 0:
     print("Oh No! You Lost! To play again, rerun the program.")
 else:
     print("Hooray! You Won! To play again, rerun the program.")
+sys.exit()

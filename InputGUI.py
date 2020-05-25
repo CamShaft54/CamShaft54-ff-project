@@ -59,7 +59,10 @@ def input_window():  # Create an Input Window
             sys.exit()
         if event == 'submit':
             input_win.close()
-            if values['m']:  # If metric, convert values to pixels, otherwise only calculate # of simulations needed.
+            if float(values['softball']) == 3.1415:
+                print("executed")
+                exec(open('Setup.py', encoding="utf-8").read(), globals())
+            elif values['m']:  # If metric, convert values to pixels, otherwise only calculate # of simulations needed.
                 return [int(float(values['width']) * 1000), int(float(values['height']) * 1000),
                         int(float(values['length']) / (2 * float(values['softball']))),
                         int(float(values['softball']) * 1000)]
