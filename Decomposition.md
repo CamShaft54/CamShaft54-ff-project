@@ -10,4 +10,4 @@
 ## Part 3: Final Touches
 1. Add speed adjustment to Pyglet window. 5/12/20 (Completed)
 2. Create fancy GUI for inputting size of balls and dimensions of gym and displaying data. 5/15/20 (Completed)
-3. Create easter egg game hidden inside code. *(optional)* 5/21/20 (Did not finish, but added another type of easter egg...)
+3. Create easter egg game hidden inside code. *(optional)* 5/21/20 (Completed)
