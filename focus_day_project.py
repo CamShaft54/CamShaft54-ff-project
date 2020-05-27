@@ -8,13 +8,18 @@ import random
 
 '''DO NOT RUN THIS PROGRAM! RUN OutputGUI.py INSTEAD!'''
 
-# Prompt user to select number of tests
+# Assign user selected # of sections and if user wants to split each simulation into smaller simulations.
 tests_num = user_input[2]
+multi_mode = 0
+if user_input[4]:
+    multi_mode = 1
 
 # Prompt user to enter Height and Width in pixels, radius of circles, and define mass and bounce/elasticity.
 H = user_input[1]
 W = user_input[0]
 radius = user_input[3]
+if user_input[4]:
+    radius *= 4
 mass = 1
 bounce = 0
 
@@ -95,6 +100,7 @@ checked_shapes = []
 new_balls = []
 previous_new_balls = []
 tests = []
+tests_completed = 0
 ball_spawning = False
 ball_cleanup = 0
 auto = False
@@ -140,6 +146,11 @@ def on_draw():
     window.clear()
     background_sprite.draw()
     space.debug_draw(options)
+
+
+@window.event  # when the user closes the window stop the simulation
+def on_close():
+    window.close()
 
 
 # noinspection PyUnusedLocal
@@ -214,7 +225,7 @@ def on_key_press(symbol, modifiers):  # If a key is pressed...
 
 def update(dt):  # This function is called every 1/60 of a second.
     global checked_shapes, ball_spawning, previous_new_balls, new_balls, auto, timer, ball_cleanup, stop_time, \
-        auto_auto, tests
+        auto_auto, tests, tests_completed, multi_mode
     space.step(dt + speedup)  # Step forward the physics simulation, speedup simulation if user specified.
     changed_list = False  # Set changed_list to false (If true, print number of balls in checked_shapes).
 
@@ -222,7 +233,7 @@ def update(dt):  # This function is called every 1/60 of a second.
         tests = cleanup_tests().copy()  # Remove outliers from tests.
 
     # If user specified number of tests and that number has been achieved, close the window and print results.
-    if len(tests) == tests_num and tests_num != 0:
+    if tests_completed == tests_num and tests_num != 0:
         window.close()
         auto_auto = False
         auto = False
@@ -299,13 +310,23 @@ def update(dt):  # This function is called every 1/60 of a second.
                 space.remove(shape.body, shape)
         ball_cleanup += 1
     # after 3.5(?) seconds have elapsed, log tests and restart auto if auto_auto.
-    if ball_cleanup == 3 and timer == (
-            stop_time - 30) % timer_length:
-        tests.append(len(checked_shapes))
+    if ball_cleanup == 3 and timer == (stop_time - 30) % timer_length:
+        if multi_mode > 0:
+            tests_completed += 0.25
+            if multi_mode == 1:
+                tests.append(len(checked_shapes))
+            if multi_mode > 1:
+                tests[-1] += len(checked_shapes)
+            multi_mode = multi_mode % 4 + 1
+        else:
+            tests_completed += 1
+            tests.append(len(checked_shapes))
+        print("Test results: " + str(tests) + "\nSection " + str(len(tests)) + "/" + str(tests_num))
+        if multi_mode > 0:
+            print("Simulation " + str(multi_mode - 1) + "/4")
         checked_shapes.clear()
         new_balls.clear()
         previous_new_balls.clear()
-        print("Test results: " + str(tests))
         if auto_auto:
             for shape in space.shapes:
                 if shape not in wall_shapes or shape == segment_shape_top:

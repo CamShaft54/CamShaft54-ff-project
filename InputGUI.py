@@ -50,7 +50,11 @@ def input_window():  # Create an Input Window
          Sg.Input("7", key='height', size=(5, 1))],
         [Sg.Text("Length of Gym: "), Sg.Input("28", key='length', size=(5, 1))],
         [Sg.Text("Softball Radius: "), Sg.Input("0.35", key='softball', size=(5, 1))],
-        [Sg.Button("Submit", key='submit'), Sg.Cancel()]
+        [Sg.Text("If you entered a ball radius less than 0.35m (350px) then select the multiple simulations per section"
+                 " option below.")],
+        [Sg.Text("Multiple Simulations Mode:"), Sg.Radio("On", group_id='multi_mode', key='multi_on'),
+         Sg.Radio("Off", group_id='multi_mode', key='multi_off')],
+        [Sg.Button("Submit", key='submit', bind_return_key=True), Sg.Cancel()]
     ]
     input_win = Sg.Window('Input', input_layout)
     while True:
@@ -60,14 +64,14 @@ def input_window():  # Create an Input Window
         if event == 'submit':
             input_win.close()
             if float(values['softball']) == 3.1415:
-                print("executed")
                 exec(open('Setup.py', encoding="utf-8").read(), globals())
             elif values['m']:  # If metric, convert values to pixels, otherwise only calculate # of simulations needed.
                 return [int(float(values['width']) * 1000), int(float(values['height']) * 1000),
                         int(float(values['length']) / (2 * float(values['softball']))),
-                        int(float(values['softball']) * 1000)]
+                        int(float(values['softball']) * 1000), values['multi_on']]
             return [int(values['width']), int(values['height']),
-                    int(float(values['length']) / (2 * float(values['softball']))), int(values['softball'])]
+                    int(float(values['length']) / (2 * float(values['softball']))), int(values['softball']),
+                    values['multi_on']]
 
 
 # Driver Code

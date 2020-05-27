@@ -114,7 +114,7 @@ while saves > 0:
     print(" ".join(correct_guesses))
     print("Letters already guessed: " + ", ".join(guesses))
     guess = input("Guess a letter or the full word: ").lower()
-    if guess in guesses or not guess.isalpha():
+    if guess.upper() in guesses or not guess.isalpha():
         print("You've already guessed that or what you entered is invalid!")
         continue
     else:
