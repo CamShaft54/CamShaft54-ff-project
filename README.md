@@ -18,7 +18,7 @@ graph I used MatPlotLib.
 * PySimpleGUI Cookbook: https://pysimplegui.readthedocs.io/en/latest/cookbook/
 
 ### Bugs
-1. If the user creates a ball with a radius smaller than 0.35m the simulator will glitch because it cannot handle that many
+1. If the user creates a ball with a radius smaller than 0.35m the simulator will glitch because it cannot handle so many
 balls. To avoid this, don't enter a ball size smaller than that.
 2. If the user uses auto mode or auto auto mode, sometimes the box will only fill up 10% with balls before shutting off. This has
 temporarily been fixed by removing these outliers from the program. If it is shutting off early, just ignore it.
