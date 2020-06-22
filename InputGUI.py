@@ -8,8 +8,9 @@ def instructions():  # Make instructions window
     instructions_layout = [  # Define layout of instructions window.
         [Sg.Text("Welcome to Softballs in the Gym Day Simulator!")],
         [Sg.Text(
-            "In this simulator you can specify the dimensions of a gym and the size of the softball to run a visual "
-            "simulation.")],
+            "In this simulator you can specify the dimensions of a gym and the size of the ball to run a visual "
+            "simulation.\nCurrently only Yoga balls, Basketballs, Team Volleyballs, Bowling Balls"
+            ", and Water Polo balls are supported.")],
         [Sg.Text("Here are the keyboard shortcuts for the simulator:")],
         [Sg.Text("A: Auto Mode, spawns balls automatically until the balls reach the top of the gym.")],
         [Sg.Text("Q: Auto Auto Mode, activates auto mode and when auto mode completes it restarts again.")],
@@ -23,7 +24,7 @@ def instructions():  # Make instructions window
         [Sg.Text("T: Toggle Top Wall, adds or removes the top wall of the gym.")],
         [Sg.Text("Mouse Click: Spawns ball at mouse coordinate.")],
         [Sg.Text("Note: due to constraints of the physics engine used, using a ball with a radius less than 0.35m will "
-                 "not work. A fix may be available in the future for this.")],
+                 "not work. See input window for more details.")],
         [Sg.Button('Continue', key='instructions_continue'), Sg.Cancel()]
     ]
     instructions_window = Sg.Window('Welcome', instructions_layout)
@@ -49,7 +50,7 @@ def input_window():  # Create an Input Window
         [Sg.Text("Width of Gym: "), Sg.Input("15", key='width', size=(5, 1)), Sg.Text("Height of Gym"),
          Sg.Input("7", key='height', size=(5, 1))],
         [Sg.Text("Length of Gym: "), Sg.Input("28", key='length', size=(5, 1))],
-        [Sg.Text("Softball Radius: "), Sg.Input("0.35", key='softball', size=(5, 1))],
+        [Sg.Text("Ball Radius: "), Sg.Input("0.35", key='softball', size=(5, 1))],
         [Sg.Text("If you entered a ball radius less than 0.35m (350px) then select the multiple simulations per section"
                  " option below.")],
         [Sg.Text("Multiple Simulations Mode:"), Sg.Radio("On", group_id='multi_mode', key='multi_on'),
